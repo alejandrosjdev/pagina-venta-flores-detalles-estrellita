@@ -1,12 +1,11 @@
 /**
  * ==========================================================================
- * PACIFIC TOWING & WINDSOR TOWING - CORE JS MOTOR
+ * DETALLES ESTRELLITA - CORE JS MOTOR
  * ==========================================================================
  */
 
 function makePhoneCall(phoneNumber) {
-
-    const DEFAULT_NUMBER = '+17077744810';
+    const DEFAULT_NUMBER = '+51913224531';
     
     try {
         const targetNumber = (typeof phoneNumber === 'string' && phoneNumber.trim() !== '') 
@@ -23,116 +22,46 @@ function makePhoneCall(phoneNumber) {
     }
 }
 
-function sendEmergencyEmail(serviceName) {
-    const companyEmail = 'Towservice101@gmail.com';
-    const clientPhone = '+17077744810'; 
-    const defaultService = serviceName || 'Towing / Roadside Assistance';
+function openWhatsApp(phoneNumber) {
+    const DEFAULT_NUMBER = '51913224531';
+    const targetNumber = (typeof phoneNumber === 'string' && phoneNumber.trim() !== '') 
+        ? phoneNumber.trim().replace('+', '') 
+        : DEFAULT_NUMBER;
+        
+    // Saludo automático para el comprador
+    const message = encodeURIComponent('¡Hola, Detalles Estrellita! Me gustaría obtener más información sobre sus detalles y catálogos.');
     
-    const subject = `Urgent Assistance Request: ${defaultService} - Pacific Towing`;
-    const body = `Hello Pacific Towing,\n\nI am reaching out to your dispatch line (${clientPhone}) because I urgently require assistance for: ${defaultService}.\n\nI am currently on the road near Santa Rosa/Healdsburg and need help as soon as possible.\n\nPlease contact me back at this email address or via my phone.\n\nRegards.`;
-    
-    const mailtoUrl = `mailto:${companyEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.assign(mailtoUrl);
+    try {
+        if (typeof window !== 'undefined' && window.location) {
+            window.open(`https://wa.me/${targetNumber}?text=${message}`, '_blank');
+        } else {
+            console.error('Error: El objeto window no está disponible.');
+        }
+    } catch (error) {
+        console.error('Ocurrió un error al intentar abrir WhatsApp:', error);
+    }
 }
 
-function showCustomAlert(title, message, type) {
-    const overlay = document.getElementById("custom-alert");
-    const titleEl = document.getElementById("custom-alert-title");
-    const msgEl = document.getElementById("custom-alert-message");
-    const iconEl = document.getElementById("custom-alert-icon");
-    const btn = document.getElementById("custom-alert-btn");
 
-    if (!overlay || !titleEl || !msgEl || !iconEl || !btn) return;
-
-    titleEl.textContent = title;
-    msgEl.textContent = message;
+/**
+ * Función para comprar un producto específico vía WhatsApp
+ */
+function buyProduct(productName) {
+    const phoneNumber = '51913224531'; // Tu número de Detalles Estrellita
     
-    if (type === 'success') {
-        iconEl.innerHTML = '<i class="fas fa-check-circle"></i>';
-        iconEl.className = 'custom-alert-icon success';
-        btn.style.backgroundColor = '#28a745';
-    } else {
-        iconEl.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
-        iconEl.className = 'custom-alert-icon error';
-        btn.style.backgroundColor = '#cc1818';
+    // Mensaje predeterminado con el nombre del producto en negrita (usando * en WhatsApp)
+    const message = `¡Hola, Detalles Estrellita! Me encantaría adquirir el detalle: *${productName}*. ¿Podrían brindarme los pasos para concretar la compra?`;
+    
+    const encodedMessage = encodeURIComponent(message);
+    
+    try {
+        if (typeof window !== 'undefined' && window.location) {
+            window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+        }
+    } catch (error) {
+        console.error('Ocurrió un error al intentar abrir WhatsApp para la compra:', error);
     }
-
-    overlay.classList.add("show");
-
-    btn.onclick = function() {
-        overlay.classList.remove("show");
-    };
 }
-
-// ==========================================================================
-// Fomulario
-// ==========================================================================
-document.addEventListener("DOMContentLoaded", () => {
-    const gmailBtn = document.getElementById("sticky-gmail-btn");
-    if (gmailBtn) {
-        gmailBtn.addEventListener("click", (event) => {
-            event.preventDefault(); 
-            if (typeof sendEmergencyEmail === "function") {
-                sendEmergencyEmail('General Inquiry'); 
-            }
-        });
-    }
-    const quoteForm = document.getElementById("quoteForm");
-    if (quoteForm) {
-        quoteForm.addEventListener("submit", async (event) => {
-            event.preventDefault(); 
-            const COOLDOWN_TIME = 60000;
-            const lastSubmission = localStorage.getItem('lastFormSubmission');
-            const now = Date.now();
-            if (lastSubmission && (now - lastSubmission) < COOLDOWN_TIME) {
-                showCustomAlert(
-                    "Slow down!", 
-                    "Please wait a minute before sending another request.", 
-                    "error"
-                );
-                return;
-            }
-            const submitBtn = quoteForm.querySelector(".btn-submit-quote");
-            const originalBtnText = submitBtn.innerHTML;
-            
-            submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Sending Request...`;
-            submitBtn.disabled = true;
-
-            const formData = new FormData(quoteForm);
-
-            try {
-                const response = await fetch(quoteForm.action, {
-                    method: "POST",
-                    body: formData,
-                    headers: { 'Accept': 'application/json' }
-                });
-
-                if (!response.ok) throw new Error("Network response was not ok");
-
-                localStorage.setItem('lastFormSubmission', Date.now());
-
-                showCustomAlert(
-                    "Awesome!", 
-                    "Your quote request has been sent successfully. The owner will review it and get back to you soon.", 
-                    "success"
-                );
-                
-                quoteForm.reset();
-
-            } catch (error) {
-                console.error("Transmission Error:", error);
-                showCustomAlert(
-                    "Submission Failed", 
-                    "Oops! Something went wrong. Please try again or contact us directly.", 
-                    "error"
-                );
-            } finally {
-                submitBtn.innerHTML = originalBtnText;
-                submitBtn.disabled = false;
-            }
-        });
-    }
-});
 
 
 /* ==========================================================================
